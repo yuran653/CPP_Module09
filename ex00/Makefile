@@ -6,12 +6,12 @@
 #    By: jgoldste <jgoldste@student.42bangkok.co    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/08/09 10:30:11 by jgoldste          #+#    #+#              #
-#    Updated: 2023/11/18 14:33:41 by jgoldste         ###   ########.fr        #
+#    Updated: 2023/12/01 17:56:39 by jgoldste         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 # Variables
-NAME		:= easyfind
+NAME		:= bitcoinexchange
 
 SRCDIR		:= src
 OBJDIR		:= object
