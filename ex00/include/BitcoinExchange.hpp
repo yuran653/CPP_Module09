@@ -6,7 +6,7 @@
 /*   By: jgoldste <jgoldste@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 12:52:03 by jgoldste          #+#    #+#             */
-/*   Updated: 2023/12/04 19:28:19 by jgoldste         ###   ########.fr       */
+/*   Updated: 2023/12/05 02:24:40 by jgoldste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,10 @@
 
 #include <exception>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <map>
+#include <sstream>
 #include <string>
 #include <utility>
 
@@ -25,7 +27,7 @@ class BitcoinExchange {
 		static std::multimap<int, double> _data;
 		
 		static void _openReadInputFile(std::string file_name);
-		static std::pair<int, double> _saveBufferData(std::string buffer);
+		static std::pair<int, double> _parseBufferData(std::string buffer);
 
 		BitcoinExchange();
 		~BitcoinExchange();
