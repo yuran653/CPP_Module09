@@ -6,7 +6,7 @@
 /*   By: jgoldste <jgoldste@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 12:52:03 by jgoldste          #+#    #+#             */
-/*   Updated: 2023/12/05 21:28:58 by jgoldste         ###   ########.fr       */
+/*   Updated: 2023/12/06 19:38:19 by jgoldste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <iostream>
 #include <limits>
 #include <map>
+#include <cmath>
 #include <queue>
 #include <sstream>
 #include <string>
@@ -33,18 +34,14 @@
 #define DATA_HEAD "date,exchange_rate"
 #define INPUT_HEAD "date | value"
 #define DATA_FILE "data.csv"
-#define INPUT_FILE "input.txt"
 
 class BitcoinExchange {
 	private:
 		static std::multimap<int, long double>* _data;
-		// static std::multimap<int, long double>* _input;
 		static std::queue<std::pair<int, long double> >* _input;
 
 		static void _initialize();
 		static void _cleanup();
-		// static void _openReadFile
-		// 	(std::string file_name, std::multimap<int, long double>* container, char delim);
 		template <typename T>
 		static void _openReadFile (std::string file_name, T* container, char delim);
 		static void _addPair(std::multimap<int, long double>* container, std::string buffer, char delim);
@@ -52,14 +49,15 @@ class BitcoinExchange {
 		static void _deleteHead(std::multimap<int, long double>* container);
 		static void _deleteHead(std::queue<std::pair<int, long double> >* container);
 		static std::pair<int, long double> _parseBufferData(std::string buffer, char delim);
-		// static std::pair<int, long double> _findRate(int key);
+		static void _findPrintRate(std::pair<int, long double> values);
 		static std::string _printDate(int key);
+		static int _calculatePrec(long double value);
 
 		BitcoinExchange();
 		~BitcoinExchange();
 
 	public:
-		static void	printData();
+		static void	displayOutput(std::string input_file_name);
 
 	class OpenFileError : public std::runtime_error {
 		public:
