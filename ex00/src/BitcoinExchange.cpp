@@ -6,7 +6,7 @@
 /*   By: jgoldste <jgoldste@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 12:51:23 by jgoldste          #+#    #+#             */
-/*   Updated: 2023/12/06 19:39:26 by jgoldste         ###   ########.fr       */
+/*   Updated: 2023/12/07 22:57:31 by jgoldste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,18 +21,63 @@ BitcoinExchange::BitcoinExchange() {
 BitcoinExchange::~BitcoinExchange() {
 }
 
-void BitcoinExchange::_initialize() {
-	_data = new std::multimap<int, long double>;
-	_input = new std::queue<std::pair<int, long double> >;
+size_t BitcoinExchange::_calculatePrec(long double value) {
+	std::ostringstream oss;
+	oss << value;
+	std::string str = oss.str();
+	size_t pos = str.find(".");
+	return (pos == std::string::npos ? 0 : str.size() - pos - 1);
 }
-void BitcoinExchange::_cleanup() {
-	delete _data;
-	delete _input;
+
+std::string BitcoinExchange::_printDate(int key) {
+	std::ostringstream oss;
+	oss << key;
+	std::string date = oss.str();
+	date.insert(4, "-").insert(7, "-");
+	return date;
+}
+
+void BitcoinExchange::_checkOverflow(long double value) {
+	if (value < 0)
+		throw BadInput("Not a positive number");
+	else if (value > std::numeric_limits<int>::digits10)
+		throw BadInput("Too large a number");
+}
+
+void BitcoinExchange::_checkDate(int date) {
+	std::time_t current_time = std::time(NULL);
+	std::tm* current_tm = std::localtime(&current_time);
+	int current_date = (current_tm->tm_year + 1900) * 10000
+		+ (current_tm->tm_mon + 1) * 100 + current_tm->tm_mday;;
+	if (date < BTC_EXIST_DATE || date > current_date)
+		throw BadInput("Bad input => " + _printDate(date));
+}
+
+void BitcoinExchange::_findPrintRate(std::pair<int, long double> values) {
+	try {
+		_checkDate(values.first);
+		_checkOverflow(values.second);
+		std::cout << _printDate(values.first) << " => " << std::fixed
+		<< std::setprecision(_calculatePrec(values.second)) << values.second
+		<< " = "
+		<< std::setprecision(_calculatePrec(values.second)) << values.second
+		<< std::endl;
+	} catch (const BadInput& e) {
+		std::cerr << "Error: " << e.what() << std::endl;
+	}
+}
+
+void BitcoinExchange::_deleteHead(std::multimap<int, long double>* container) {
+	container->erase(container->begin());
+}
+
+void BitcoinExchange::_deleteHead(std::queue<std::pair<int, long double> >* container) {
+	container->pop();
 }
 
 std::pair<int, long double> BitcoinExchange::_parseBufferData(std::string buffer, char delim) {
-	int key = BAD_INPUT;
-	long double value = BAD_INPUT;
+	int key = -1;
+	long double value = -1;
 	if (buffer.compare(DATA_HEAD) || buffer.compare(INPUT_HEAD)) {
 		std::string key_str;
 		std::string value_str;
@@ -63,20 +108,12 @@ void BitcoinExchange::_addPair(std::queue<std::pair<int, long double> >* contain
 	container->push(_parseBufferData(buffer, delim));
 }
 
-void BitcoinExchange::_deleteHead(std::multimap<int, long double>* container) {
-	container->erase(container->begin());
-}
-
-void BitcoinExchange::_deleteHead(std::queue<std::pair<int, long double> >* container) {
-	container->pop();
-}
-
 template <typename T>
 void BitcoinExchange::_openReadFile (std::string file_name, T* container, char delim) {
 	std::ifstream is(file_name);
 	std::string buffer;
 	if (is.is_open() == false)
-		throw OpenFileError("Can't open file: " + file_name);
+		throw OpenFileError("Can not open file: " + file_name);
 	while (std::getline(is, buffer)) {
 		_addPair(container, buffer, delim);
 	}
@@ -84,31 +121,13 @@ void BitcoinExchange::_openReadFile (std::string file_name, T* container, char d
 	_deleteHead(container);
 }
 
-int BitcoinExchange::_calculatePrec(long double value) {
-	long double decimal_part = fabs(value - static_cast<int>(value));
-	int precision = 0;
-	for (; decimal_part && precision < std::numeric_limits<long double>::digits10; precision++) {
-		decimal_part *= 10;
-		decimal_part = decimal_part - static_cast<int>(decimal_part);
-	}
-	return precision;
+void BitcoinExchange::_initialize() {
+	_data = new std::multimap<int, long double>;
+	_input = new std::queue<std::pair<int, long double> >;
 }
-
-std::string BitcoinExchange::_printDate(int key) {
-	std::ostringstream oss;
-	oss << key;
-	std::string date = oss.str();
-	date.insert(4, "-");
-	date.insert(7, "-");
-	return date;
-}
-
-void BitcoinExchange::_findPrintRate(std::pair<int, long double> values) {
-	if (values.first > 0) {
-		std::cout << _printDate(values.first) << " => " << std::fixed
-			<< std::setprecision(_calculatePrec(values.second)) << values.second << " = "
-			<< std::setprecision(_calculatePrec(values.second)) << values.second << std::endl;
-	}
+void BitcoinExchange::_cleanup() {
+	delete _data;
+	delete _input;
 }
 
 void BitcoinExchange::displayOutput(std::string input_file_name) {
