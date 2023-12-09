@@ -6,7 +6,7 @@
 /*   By: jgoldste <jgoldste@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 12:51:23 by jgoldste          #+#    #+#             */
-/*   Updated: 2023/12/09 11:32:58 by jgoldste         ###   ########.fr       */
+/*   Updated: 2023/12/09 18:00:06 by jgoldste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,18 @@ BitcoinExchange::BitcoinExchange() {
 }
 
 BitcoinExchange::~BitcoinExchange() {
+}
+
+std::pair<int, long double> BitcoinExchange::_findValueByKey(int key) {
+	std::multimap<int, long double>::iterator values_found = _data->lower_bound(key);
+	if (values_found == _data->begin()) {
+		if (values_found->first == key)
+			return *values_found;
+		else
+			throw BadInput("No matching date");
+	}
+	values_found--;
+	return *values_found;	
 }
 
 size_t BitcoinExchange::_calculatePrec(long double value) {
@@ -40,31 +52,11 @@ std::string BitcoinExchange::_printDate(int key) {
 void BitcoinExchange::_checkOverflow(std::pair<int, long double> values) {
 	if (values.second < 0)
 		throw BadInput("Not a positive number");
-	else if (values.second > std::numeric_limits<int>::digits10)
+	else if (values.second > std::numeric_limits<int>::max()) {
+		std::cout << values.second << " > " << std::numeric_limits<int>::max() << std::endl;
 		throw BadInput("Too large a number");
+	}
 }
-
-// void BitcoinExchange::_checkDate(std::pair<int, long double> values) {
-// 	std::time_t current_time = std::time(NULL);
-// 	std::tm* current_tm = std::localtime(&current_time);
-// 	int current_date = (current_tm->tm_year + 1900) * 10000
-// 		+ (current_tm->tm_mon + 1) * 100 + current_tm->tm_mday;
-// 	int year = values.first / 10000;
-// 	int month = (values.first - year * 10000) / 100;
-// 	if (values.first < BTC_EXIST_DATE || values.first > current_date || month > 12)
-// 		throw BadInput("Bad input => " + _printDate(values.first));
-// 	int day = (values.first - year * 10000) % 100;
-// 	if ((month == 1 || month == 3 || month == 5 || month == 7
-// 		|| month == 8 || month == 10 || month == 12) && day > 31)
-// 		throw BadInput("Bad input => " + _printDate(values.first));
-// 	else if ((month == 2 || month == 4 || month == 6 || month == 9 || month == 11)
-// 		&& day > 30)
-// 		throw BadInput("Bad input => " + _printDate(values.first));
-// 	else if (year % 4 != 0 && month == 2 && day > 28)
-// 		throw BadInput("Bad input => " + _printDate(values.first));
-// 	else if ((year % 4 == 0 && month == 2 && day > 29))
-// 		throw BadInput("Bad input => " + _printDate(values.first));
-// }
 
 void BitcoinExchange::_checkDate(std::pair<int, long double> values) {
 	std::time_t current_time = std::time(NULL);
@@ -103,19 +95,20 @@ void BitcoinExchange::_findPrintRate(std::pair<int, long double> values) {
 	try {
 		_checkDate(values);
 		_checkOverflow(values);
-		std::cout << _printDate(values.first) << " => " << std::fixed
+		std::pair<int, long double> values_found = _findValueByKey(values.first);
+		std::cout << _printDate(values_found.first) << " => " << std::fixed
 		<< std::setprecision(_calculatePrec(values.second)) << values.second
-		<< " = "
-		<< std::setprecision(_calculatePrec(values.second)) << values.second
-		<< std::endl;
+		<< " = ";
+		long double result = values_found.second * values.second;
+		std::cout << std::fixed << std::setprecision(_calculatePrec(result)) << result << std::endl;
 	} catch (const BadInput& e) {
 		std::cerr << "Error: " << e.what() << std::endl;
 	}
 }
 
 std::pair<int, long double> BitcoinExchange::_parseBufferData(std::string buffer, std::string delim) {
-	int key = BAD_INPUT;
-	long double value = BAD_INPUT;
+	int key = -1;
+	long double value = -1;
 	std::string key_str;
 	std::string value_str;
 	int i = 0;
@@ -156,6 +149,8 @@ void BitcoinExchange::_openReadFile (std::string file_name, std::string header, 
 	while (std::getline(is, buffer))
 		_addPair(container, buffer);
 	is.close();
+	if (container->empty())
+		throw OpenFileError("The file is empty: " + file_name);
 }
 
 void BitcoinExchange::_initialize() {

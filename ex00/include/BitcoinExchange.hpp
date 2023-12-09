@@ -6,19 +6,19 @@
 /*   By: jgoldste <jgoldste@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 12:52:03 by jgoldste          #+#    #+#             */
-/*   Updated: 2023/12/08 18:16:03 by jgoldste         ###   ########.fr       */
+/*   Updated: 2023/12/09 17:57:33 by jgoldste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef BITCOINEXCHANGE_HPP
 #define BITCOINEXCHANGE_HPP
 
+#include <algorithm>
 #include <ctime>
 #include <exception>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <limits>
 #include <map>
 #include <queue>
 #include <sstream>
@@ -32,7 +32,6 @@
 #define DATA_HEAD "date,exchange_rate"
 #define INPUT_HEAD "date | value"
 #define DATA_FILE "data.csv"
-#define BAD_INPUT -1
 
 class BitcoinExchange {
 	private:
@@ -51,6 +50,7 @@ class BitcoinExchange {
 		static void _checkOverflow(std::pair<int, long double> values);
 		static std::string _printDate(int key);
 		static size_t _calculatePrec(long double value);
+		static std::pair<int, long double> _findValueByKey(int key);
 
 		BitcoinExchange();
 		~BitcoinExchange();
