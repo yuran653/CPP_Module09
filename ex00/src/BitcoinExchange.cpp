@@ -6,7 +6,7 @@
 /*   By: jgoldste <jgoldste@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 12:51:23 by jgoldste          #+#    #+#             */
-/*   Updated: 2023/12/08 19:46:19 by jgoldste         ###   ########.fr       */
+/*   Updated: 2023/12/09 11:32:58 by jgoldste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,33 +73,30 @@ void BitcoinExchange::_checkDate(std::pair<int, long double> values) {
 		+ (current_tm->tm_mon + 1) * 100 + current_tm->tm_mday;
 	int year = values.first / 10000;
 	int month = (values.first - year * 10000) / 100;
-	if (values.first < BTC_EXIST_DATE || values.first > current_date
-		|| month < 1 || month > 12)
-		throw BadInput("Bad input => " + _printDate(values.first));
 	int day = (values.first - year * 10000) % 100;
+	if (values.first < BTC_EXIST_DATE || values.first > current_date
+		|| month < 1 || month > 12 || day < 1)
+		throw BadInput("Bad input => " + _printDate(values.first));
 	bool leap_year = (year % 4 == 0);
 	switch (month) {
-		case 1: case 3: case 5: case 7: case 8: case 10: case 12:
+		case 1: case 3: case 5: case 7: case 8: case 10: case 12: {
 			if (day > 31)
 				throw BadInput("Bad input => " + _printDate(values.first));
-		case 4: case 6: case 9: case 11:
+				break;
+		} case 4: case 6: case 9: case 11: {
 			if (day > 30)
 				throw BadInput("Bad input => " + _printDate(values.first));
-		case 2:
-			if 
+				break;
+		} case 2: {
+			if (leap_year == true && day > 29) {
+				throw BadInput("Bad input => " + _printDate(values.first));
+				break;
+			} else if (leap_year == false && day > 28) {
+				throw BadInput("Bad input => " + _printDate(values.first));
+				break;
+			}
+		}
 	}
-
-
-	if ((month == 1 || month == 3 || month == 5 || month == 7
-		|| month == 8 || month == 10 || month == 12) && day > 31)
-		throw BadInput("Bad input => " + _printDate(values.first));
-	else if ((month == 2 || month == 4 || month == 6 || month == 9 || month == 11)
-		&& day > 30)
-		throw BadInput("Bad input => " + _printDate(values.first));
-	else if (year % 4 != 0 && month == 2 && day > 28)
-		throw BadInput("Bad input => " + _printDate(values.first));
-	else if ((year % 4 == 0 && month == 2 && day > 29))
-		throw BadInput("Bad input => " + _printDate(values.first));
 }
 
 void BitcoinExchange::_findPrintRate(std::pair<int, long double> values) {
