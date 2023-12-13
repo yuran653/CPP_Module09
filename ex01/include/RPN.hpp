@@ -6,14 +6,13 @@
 /*   By: jgoldste <jgoldste@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 12:54:29 by jgoldste          #+#    #+#             */
-/*   Updated: 2023/12/12 20:29:13 by jgoldste         ###   ########.fr       */
+/*   Updated: 2023/12/13 19:34:18 by jgoldste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <algorithm>
 #include <deque>
 #include <iostream>
-// #include <queue>
-// #include <stack>
 #include <string>
 
 #define SPACE_SIGN ' '
@@ -24,21 +23,21 @@
 
 class RPN {
 	private:
-		// static std::queue<char>* _rpn_queue;
-		// static std::stack<char>* _rpn_input;
-		// static std::stack<char>* _rpn_stack;
 		static std::deque<char>* _rpn_input;
 		static std::deque<char>* _rpn_stack;
 
 		static void _initialize();
 		static void _cleanup();
 		static void _saveParseInput(std::string input);
+		static int _calculateStack();
+		static int _calculateExpression();
+		static int _charToInt(char c);
 
 		RPN();
 		~RPN();
 
 	public:
-		static int calculateRPN(std::string input);
+		static void calculateRPN(std::string input);
 
 		class BadInput : public std::runtime_error {
 			public:
