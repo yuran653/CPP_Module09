@@ -6,14 +6,14 @@
 /*   By: jgoldste <jgoldste@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 12:54:35 by jgoldste          #+#    #+#             */
-/*   Updated: 2023/12/14 15:48:20 by jgoldste         ###   ########.fr       */
+/*   Updated: 2023/12/14 19:39:52 by jgoldste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RPN.hpp"
 
 std::deque<char>* RPN::_rpn_input;
-std::stack<char>* RPN::_rpn_stack;
+std::stack<int>* RPN::_rpn_stack;
 
 RPN::RPN() {
 }
@@ -33,13 +33,29 @@ int RPN::_calculateExpression(std::divides<int> func) {
 	_rpn_input->pop_front();
 	if (_rpn_stack->size() < 2)
 		throw BadInput("Not enough operands before operator");
-	int b = _charToInt(_rpn_stack->top());
+	int b = _rpn_stack->top();
 	if (b == 0)
 		throw BadInput("Division by zero");
 	_rpn_stack->pop();
-	int a = _charToInt(_rpn_stack->top());
+	int a = _rpn_stack->top();
 	_rpn_stack->pop();
-	return(_intToChar(func(a, b)));
+	return func(a, b);
+}
+
+int RPN::_calculateExpression(std::minus<int> func) {
+	_rpn_input->pop_front();
+	if (_rpn_stack->size() == 0) {
+		_rpn_stack->push(_charToInt(_rpn_input->front()));
+		_rpn_input->pop_front();
+	}
+	int b = _rpn_stack->top();
+	_rpn_stack->pop();
+	int a = 0;
+	if (_rpn_stack->size() > 0) {
+		a = _rpn_stack->top();
+		_rpn_stack->pop();
+	}
+	return func(a, b);
 }
 
 template <typename Func>
@@ -47,16 +63,17 @@ int RPN::_calculateExpression(Func func) {
 	_rpn_input->pop_front();
 	if (_rpn_stack->size() < 2)
 		throw BadInput("Not enough operands before operator");
-	int b = _charToInt(_rpn_stack->top());
+	int b = _rpn_stack->top();
 	_rpn_stack->pop();
-	int a = _charToInt(_rpn_stack->top());
+	int a = _rpn_stack->top();
 	_rpn_stack->pop();
-	return(_intToChar(func(a, b)));
+	return func(a, b);
 }
 
 int RPN::_calculateStack() {
-	while (_rpn_input->empty() == false) {
-		switch(_rpn_input->front()) {
+	while (_rpn_input->size()) {
+
+		switch (_rpn_input->front()) {
 			case ADD_SIGN:
 				_rpn_stack->push(_calculateExpression(_add));
 				break;
@@ -70,13 +87,13 @@ int RPN::_calculateStack() {
 				_rpn_stack->push(_calculateExpression(_divide));
 				break;
 			default:
-				_rpn_stack->push(_rpn_input->front());
+				_rpn_stack->push(_charToInt(_rpn_input->front()));
 				_rpn_input->pop_front();
 		}
 	}
 	if (_rpn_stack->size() != 1)
 		throw BadInput("More operands than operators");
-	return _charToInt(_rpn_stack->top());
+	return _rpn_stack->top();
 }
 
 void RPN::_saveParseInput(std::string input) {
@@ -109,7 +126,7 @@ void RPN::_saveParseInput(std::string input) {
 
 void RPN::_initialize() {
 	_rpn_input = new std::deque<char>;
-	_rpn_stack = new std::stack<char>;
+	_rpn_stack = new std::stack<int>;
 }
 
 void RPN::_cleanup() {

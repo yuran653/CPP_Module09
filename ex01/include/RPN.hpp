@@ -6,7 +6,7 @@
 /*   By: jgoldste <jgoldste@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 12:54:29 by jgoldste          #+#    #+#             */
-/*   Updated: 2023/12/14 15:47:21 by jgoldste         ###   ########.fr       */
+/*   Updated: 2023/12/14 19:32:57 by jgoldste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 class RPN {
 	private:
 		static std::deque<char>* _rpn_input;
-		static std::stack<char>* _rpn_stack;
+		static std::stack<int>* _rpn_stack;
 
 		static std::plus<int> _add;
 		static std::minus<int> _subtract;
@@ -40,6 +40,7 @@ class RPN {
 		template <typename Func>
 		static int _calculateExpression(Func func);
 		static int _calculateExpression(std::divides<int> func);
+		static int _calculateExpression(std::minus<int> func);
 		static int _charToInt(char c);
 		static char _intToChar(int i);
 
