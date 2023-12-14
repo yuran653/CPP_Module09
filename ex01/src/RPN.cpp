@@ -6,14 +6,14 @@
 /*   By: jgoldste <jgoldste@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 12:54:35 by jgoldste          #+#    #+#             */
-/*   Updated: 2023/12/13 19:33:24 by jgoldste         ###   ########.fr       */
+/*   Updated: 2023/12/14 15:48:20 by jgoldste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RPN.hpp"
 
 std::deque<char>* RPN::_rpn_input;
-std::deque<char>* RPN::_rpn_stack;
+std::stack<char>* RPN::_rpn_stack;
 
 RPN::RPN() {
 }
@@ -21,48 +21,62 @@ RPN::RPN() {
 RPN::~RPN() {
 }
 
-// int RPN::_calculateStack() {
-// 	int result = 0;
-// 	while (_rpn_input->empty() == false) {
-// 		if (_rpn_input->front() == ADD_SIGN || _rpn_input->front() == SUBTRACT_SIGN
-// 			|| _rpn_input->front() == MULTIPLY_SIGN || _rpn_input->front() == DIVISION_SIGN) {
-// 			if (_rpn_stack->size() < 2
-// 				|| (isdigit(_rpn_stack->at(0)) != 0 && isdigit(_rpn_stack->at(1)) != 0))
-// 				throw BadInput("Not enough operands in the stack");
-// 			char action_sign = _rpn_input->front();
-// 			_rpn_input->pop_front();
-// 			result = (_rpn_stack->at(0) action_sign _rpn_stack->at(1))
-// 		}
-// 		_rpn_stack->push_front(_rpn_input->front());
-// 		_rpn_input->pop_front();
-// 	}
-// 	return result;
-// }
+char RPN::_intToChar(int i) {
+	return (i + '0');
+}
 
+int RPN::_charToInt(char c) {
+	return (c - '0');
+}
 
+int RPN::_calculateExpression(std::divides<int> func) {
+	_rpn_input->pop_front();
+	if (_rpn_stack->size() < 2)
+		throw BadInput("Not enough operands before operator");
+	int b = _charToInt(_rpn_stack->top());
+	if (b == 0)
+		throw BadInput("Division by zero");
+	_rpn_stack->pop();
+	int a = _charToInt(_rpn_stack->top());
+	_rpn_stack->pop();
+	return(_intToChar(func(a, b)));
+}
+
+template <typename Func>
+int RPN::_calculateExpression(Func func) {
+	_rpn_input->pop_front();
+	if (_rpn_stack->size() < 2)
+		throw BadInput("Not enough operands before operator");
+	int b = _charToInt(_rpn_stack->top());
+	_rpn_stack->pop();
+	int a = _charToInt(_rpn_stack->top());
+	_rpn_stack->pop();
+	return(_intToChar(func(a, b)));
+}
 
 int RPN::_calculateStack() {
-	int result = 0;
 	while (_rpn_input->empty() == false) {
 		switch(_rpn_input->front()) {
 			case ADD_SIGN:
-
+				_rpn_stack->push(_calculateExpression(_add));
 				break;
 			case SUBTRACT_SIGN:
-
+				_rpn_stack->push(_calculateExpression(_subtract));
 				break;
 			case MULTIPLY_SIGN:
-
+				_rpn_stack->push(_calculateExpression(_multiply));
 				break;
 			case DIVISION_SIGN:
-
+				_rpn_stack->push(_calculateExpression(_divide));
 				break;
 			default:
-				_rpn_stack->push_front(_rpn_input->front());
+				_rpn_stack->push(_rpn_input->front());
 				_rpn_input->pop_front();
 		}
 	}
-	return result;
+	if (_rpn_stack->size() != 1)
+		throw BadInput("More operands than operators");
+	return _charToInt(_rpn_stack->top());
 }
 
 void RPN::_saveParseInput(std::string input) {
@@ -95,7 +109,7 @@ void RPN::_saveParseInput(std::string input) {
 
 void RPN::_initialize() {
 	_rpn_input = new std::deque<char>;
-	_rpn_stack = new std::deque<char>;
+	_rpn_stack = new std::stack<char>;
 }
 
 void RPN::_cleanup() {
