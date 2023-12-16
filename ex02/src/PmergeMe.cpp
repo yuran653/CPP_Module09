@@ -6,7 +6,7 @@
 /*   By: jgoldste <jgoldste@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 12:56:14 by jgoldste          #+#    #+#             */
-/*   Updated: 2023/12/16 15:46:58 by jgoldste         ###   ########.fr       */
+/*   Updated: 2023/12/16 15:52:56 by jgoldste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void PmergeMe::_parseSequence(char* sequence[]) {
 		std::string str(sequence[i]);
 		if (std::find_if(str.begin(), str.end(), myIsDigit()) != str.end())
 			throw PmergeError("The sequence contains non-digit characters");
-		int num;
+		long long num;
 		std::istringstream(str) >> num;
 		if (num < 0 || num > INT_MAX)
 			throw PmergeError("The sequence contains too large or negative number");
