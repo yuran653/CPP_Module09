@@ -6,7 +6,7 @@
 /*   By: jgoldste <jgoldste@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 12:56:11 by jgoldste          #+#    #+#             */
-/*   Updated: 2023/12/17 17:47:31 by jgoldste         ###   ########.fr       */
+/*   Updated: 2023/12/19 00:23:41 by jgoldste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,3 +20,6 @@
 	PmergeMe::sortSequence(argv);
 	return 0;
  }
+
+ // ./PmergeMe `shuf -i 1-3000 -n 30000 | tr '\n' ' '`
+ // ./PmergeMe `jot -r 3000 1 30000 | tr '\n' ' '`
