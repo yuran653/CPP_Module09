@@ -6,7 +6,7 @@
 /*   By: jgoldste <jgoldste@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 12:56:09 by jgoldste          #+#    #+#             */
-/*   Updated: 2023/12/18 00:08:55 by jgoldste         ###   ########.fr       */
+/*   Updated: 2023/12/18 23:00:10 by jgoldste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,14 +23,14 @@
 
 class PmergeMe {
 	private:
-		static std::vector<int>* _vectorSequence;
-		static std::list<int>* _listSequence;
+		static std::vector<int> _vectorSequence;
+		static std::list<int> _listSequence;
 
 		PmergeMe();
 		~PmergeMe();
 
-		static void _initialize();
-		static void _cleanup();
+		// static void _initialize();
+		// static void _cleanup();
 		static void _parseSequence(char* sequence[]);
 		template <typename T>
 		static bool _isSorted(T& container);
