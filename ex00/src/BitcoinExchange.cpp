@@ -6,7 +6,7 @@
 /*   By: jgoldste <jgoldste@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 12:51:23 by jgoldste          #+#    #+#             */
-/*   Updated: 2023/12/19 16:42:17 by jgoldste         ###   ########.fr       */
+/*   Updated: 2023/12/19 19:35:40 by jgoldste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,8 @@ std::pair<int, long double> BitcoinExchange::_findValueByKey(const int& key) {
 		else
 			throw BadInput("No matching date");
 	}
-	values_found--;
+	if (values_found->first != key)
+		values_found--;
 	return *values_found;	
 }
 
