@@ -6,7 +6,7 @@
 /*   By: jgoldste <jgoldste@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 12:56:11 by jgoldste          #+#    #+#             */
-/*   Updated: 2023/12/19 00:23:41 by jgoldste         ###   ########.fr       */
+/*   Updated: 2023/12/19 16:58:29 by jgoldste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 		std::cerr << "Error: Wrong number of arguments" << std::endl;
 		return 0;
 	}
-	PmergeMe::sortSequence(argv);
+	PmergeMe::sortSequence((const char**)argv);
 	return 0;
  }
 

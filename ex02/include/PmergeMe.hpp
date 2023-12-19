@@ -6,7 +6,7 @@
 /*   By: jgoldste <jgoldste@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 12:56:09 by jgoldste          #+#    #+#             */
-/*   Updated: 2023/12/19 00:47:47 by jgoldste         ###   ########.fr       */
+/*   Updated: 2023/12/19 16:56:17 by jgoldste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ class PmergeMe {
 
 		static void _initialize();
 		static void _cleanup();
-		static void _parseSequence(char* sequence[]);
+		static void _parseSequence(const char* sequence[]);
 		static void _printSequence();
 		template <typename T>
 		static bool _isSorted(T*& container);
@@ -54,5 +54,5 @@ class PmergeMe {
 		};
 
 	public:
-		static void sortSequence (char* sequence[]);
+		static void sortSequence (const char* sequence[]);
 };

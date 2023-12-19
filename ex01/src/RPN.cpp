@@ -6,7 +6,7 @@
 /*   By: jgoldste <jgoldste@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 12:54:35 by jgoldste          #+#    #+#             */
-/*   Updated: 2023/12/14 19:39:52 by jgoldste         ###   ########.fr       */
+/*   Updated: 2023/12/19 16:51:13 by jgoldste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,11 @@ RPN::RPN() {
 RPN::~RPN() {
 }
 
-char RPN::_intToChar(int i) {
+char RPN::_intToChar(const int& i) {
 	return (i + '0');
 }
 
-int RPN::_charToInt(char c) {
+int RPN::_charToInt(const char& c) {
 	return (c - '0');
 }
 
@@ -96,7 +96,7 @@ int RPN::_calculateStack() {
 	return _rpn_stack->top();
 }
 
-void RPN::_saveParseInput(std::string input) {
+void RPN::_saveParseInput(std::string& input) {
 	std::string::iterator it = input.begin();
 	while (it != input.end() && std::isspace(*it))
 		it++;
@@ -134,7 +134,8 @@ void RPN::_cleanup() {
 	delete _rpn_stack;
 }
 
-void RPN::calculateRPN(std::string input) {
+void RPN::calculateRPN(const char* argv) {
+	std::string input(argv);
 	_initialize();
 	try {
 		if (input.size() == 0)

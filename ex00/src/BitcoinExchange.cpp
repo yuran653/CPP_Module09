@@ -6,7 +6,7 @@
 /*   By: jgoldste <jgoldste@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 12:51:23 by jgoldste          #+#    #+#             */
-/*   Updated: 2023/12/09 18:00:06 by jgoldste         ###   ########.fr       */
+/*   Updated: 2023/12/19 16:42:17 by jgoldste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ BitcoinExchange::BitcoinExchange() {
 BitcoinExchange::~BitcoinExchange() {
 }
 
-std::pair<int, long double> BitcoinExchange::_findValueByKey(int key) {
+std::pair<int, long double> BitcoinExchange::_findValueByKey(const int& key) {
 	std::multimap<int, long double>::iterator values_found = _data->lower_bound(key);
 	if (values_found == _data->begin()) {
 		if (values_found->first == key)
@@ -33,7 +33,7 @@ std::pair<int, long double> BitcoinExchange::_findValueByKey(int key) {
 	return *values_found;	
 }
 
-size_t BitcoinExchange::_calculatePrec(long double value) {
+size_t BitcoinExchange::_calculatePrec(const long double& value) {
 	std::ostringstream oss;
 	oss << value;
 	std::string str = oss.str();
@@ -41,7 +41,7 @@ size_t BitcoinExchange::_calculatePrec(long double value) {
 	return (pos == std::string::npos ? 0 : str.size() - pos - 1);
 }
 
-std::string BitcoinExchange::_printDate(int key) {
+std::string BitcoinExchange::_printDate(const int& key) {
 	std::ostringstream oss;
 	oss << key;
 	std::string date = oss.str();
@@ -49,16 +49,14 @@ std::string BitcoinExchange::_printDate(int key) {
 	return date;
 }
 
-void BitcoinExchange::_checkOverflow(std::pair<int, long double> values) {
+void BitcoinExchange::_checkOverflow(const std::pair<int, long double>& values) {
 	if (values.second < 0)
 		throw BadInput("Not a positive number");
-	else if (values.second > std::numeric_limits<int>::max()) {
-		std::cout << values.second << " > " << std::numeric_limits<int>::max() << std::endl;
+	else if (values.second > std::numeric_limits<int>::max())
 		throw BadInput("Too large a number");
-	}
 }
 
-void BitcoinExchange::_checkDate(std::pair<int, long double> values) {
+void BitcoinExchange::_checkDate(const std::pair<int, long double>& values) {
 	std::time_t current_time = std::time(NULL);
 	std::tm* current_tm = std::localtime(&current_time);
 	int current_date = (current_tm->tm_year + 1900) * 10000
@@ -91,7 +89,7 @@ void BitcoinExchange::_checkDate(std::pair<int, long double> values) {
 	}
 }
 
-void BitcoinExchange::_findPrintRate(std::pair<int, long double> values) {
+void BitcoinExchange::_findPrintRate(const std::pair<int, long double>& values) {
 	try {
 		_checkDate(values);
 		_checkOverflow(values);
@@ -106,7 +104,7 @@ void BitcoinExchange::_findPrintRate(std::pair<int, long double> values) {
 	}
 }
 
-std::pair<int, long double> BitcoinExchange::_parseBufferData(std::string buffer, std::string delim) {
+std::pair<int, long double> BitcoinExchange::_parseBufferData(const std::string& buffer, std::string delim) {
 	int key = -1;
 	long double value = -1;
 	std::string key_str;
@@ -129,16 +127,59 @@ std::pair<int, long double> BitcoinExchange::_parseBufferData(std::string buffer
 	return (std::make_pair(key, value));
 }
 
-void BitcoinExchange::_addPair(std::multimap<int, long double>* container, std::string buffer) {
+void BitcoinExchange::_addPair(std::multimap<int, long double>*& container, const std::string& buffer) {
 	container->insert(_parseBufferData(buffer, DATA_DELIM));
 }
 
-void BitcoinExchange::_addPair(std::queue<std::pair<int, long double> >* container, std::string buffer) {
+void BitcoinExchange::_addPair(std::queue<std::pair<int, long double> >*& container, const std::string& buffer) {
 	container->push(_parseBufferData(buffer, INPUT_DELIM));
 }
 
+void BitcoinExchange::_isDigitLoop(const std::string& buffer, size_t& i) {
+	while (buffer[i] && isdigit(buffer[i]))
+		i++;
+}
+
+void BitcoinExchange::_checkNumberFormat(const std::string& buffer, size_t& i) {
+	if (buffer[i] == '-')
+		i++;
+	_isDigitLoop(buffer, i);
+	if (buffer[i] == '.')
+		i++;
+	_isDigitLoop(buffer, i);
+	if (buffer[i])
+		throw OpenFileError("Bad input => " + buffer);
+}
+
+void BitcoinExchange::_checkLineFormat(const std::string& buffer) {
+	size_t size = buffer.size();
+	if (size < DATE_SIZE)
+		throw OpenFileError("Bad input => " + buffer);
+	for (size_t i = 0; i < size; i++) {
+		if (i == 4 || i == 7) {
+			if (buffer[i] != '-')
+				throw OpenFileError("Bad input => " + buffer);
+		} else if (i < DATE_SIZE) {
+			if (isdigit(buffer[i]) == 0)
+				throw OpenFileError("Bad input => " + buffer);
+		} else {
+			if (buffer[i] == ',') {
+				i++;
+				_checkNumberFormat(buffer, i);
+			} else {
+				if (size < DATE_SIZE + 3)
+					throw OpenFileError("Bad input => " + buffer);
+				if (buffer[i] != ' ' && buffer[i + 1] != '|' && buffer[i + 2] != ' ')
+					throw OpenFileError("Bad input => " + buffer);
+				i += 3;
+				_checkNumberFormat(buffer, i);
+			}
+		}
+	}
+}
+
 template <typename T>
-void BitcoinExchange::_openReadFile (std::string file_name, std::string header, T* container) {
+void BitcoinExchange::_openReadFile(const std::string& file_name, const std::string& header, T*& container) {
 	std::ifstream is(file_name);
 	std::string buffer;
 	if (is.is_open() == false)
@@ -146,8 +187,10 @@ void BitcoinExchange::_openReadFile (std::string file_name, std::string header, 
 	std::getline(is, buffer);
 	if (buffer.compare(header))
 		throw OpenFileError("Wrong header: " + file_name + ": [" + buffer + "]");
-	while (std::getline(is, buffer))
+	while (std::getline(is, buffer)) {
+		_checkLineFormat(buffer);
 		_addPair(container, buffer);
+	}
 	is.close();
 	if (container->empty())
 		throw OpenFileError("The file is empty: " + file_name);
@@ -162,11 +205,12 @@ void BitcoinExchange::_cleanup() {
 	delete _input;
 }
 
-void BitcoinExchange::displayOutput(std::string input_file_name) {
+	void BitcoinExchange::displayOutput(const char* argv) {
+	const std::string input_file_name(argv);
 	_initialize();
 	try {
-		_openReadFile(input_file_name, INPUT_HEAD,_input);
-		_openReadFile(DATA_FILE, DATA_HEAD,_data);
+		_openReadFile(input_file_name, INPUT_HEAD, _input);
+		_openReadFile(DATA_FILE, DATA_HEAD, _data);
 		std::cout << INPUT_HEAD << std::endl;
 		for (int size = _input->size(); size; size--) {
 			_findPrintRate(_input->front());

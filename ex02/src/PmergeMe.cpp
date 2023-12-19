@@ -6,7 +6,7 @@
 /*   By: jgoldste <jgoldste@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 12:56:14 by jgoldste          #+#    #+#             */
-/*   Updated: 2023/12/19 01:31:45 by jgoldste         ###   ########.fr       */
+/*   Updated: 2023/12/19 17:03:38 by jgoldste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ bool PmergeMe::_isSorted(T*& container) {
 	return true;
 }
 
-void PmergeMe::_parseSequence(char* sequence[]) {
+void PmergeMe::_parseSequence(const char* sequence[]) {
 	for (int i = 1; sequence[i]; i++) {
 		const std::string str(sequence[i]);
 		if (std::find_if(str.begin(), str.end(), _myIsDigit()) != str.end())
@@ -143,7 +143,7 @@ void PmergeMe::_initialize() {
 	_listSequence = new std::list<int>;
 }
 
-void PmergeMe::sortSequence (char* sequence[]) {
+void PmergeMe::sortSequence (const char* sequence[]) {
 	_initialize();
 	std::clock_t start_time;
 	std::clock_t end_time;
@@ -154,11 +154,13 @@ void PmergeMe::sortSequence (char* sequence[]) {
 		start_time = std::clock();
 		_mergeSort(_vectorSequence);
 		end_time = std::clock();
-		double vectorSortTime = static_cast<double>(end_time - start_time) / CLOCKS_PER_SEC * 1000000.0;
+		double vectorSortTime = static_cast<double>(end_time - start_time)
+			/ static_cast<double>(CLOCKS_PER_SEC) * 1000000.0;
 		start_time = std::clock();
 		_mergeSort(_listSequence);
 		end_time = std::clock();
-		double listSortTime = static_cast<double>(end_time - start_time) / CLOCKS_PER_SEC * 1000000.0;
+		double listSortTime = static_cast<double>(end_time - start_time)
+			/ static_cast<double>(CLOCKS_PER_SEC) * 1000000.0;
 		if (_isSorted(_vectorSequence) == false || _isSorted(_listSequence) == false)
 			throw _PmergeError("The sequenses were sorted incorrectly");
 		std::cout << "After: ";

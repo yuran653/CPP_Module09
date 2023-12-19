@@ -6,7 +6,7 @@
 /*   By: jgoldste <jgoldste@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 12:54:29 by jgoldste          #+#    #+#             */
-/*   Updated: 2023/12/14 19:32:57 by jgoldste         ###   ########.fr       */
+/*   Updated: 2023/12/19 16:51:16 by jgoldste         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,20 +35,20 @@ class RPN {
 
 		static void _initialize();
 		static void _cleanup();
-		static void _saveParseInput(std::string input);
+		static void _saveParseInput(std::string& input);
 		static int _calculateStack();
 		template <typename Func>
 		static int _calculateExpression(Func func);
 		static int _calculateExpression(std::divides<int> func);
 		static int _calculateExpression(std::minus<int> func);
-		static int _charToInt(char c);
-		static char _intToChar(int i);
+		static int _charToInt(const char& c);
+		static char _intToChar(const int& i);
 
 		RPN();
 		~RPN();
 
 	public:
-		static void calculateRPN(std::string input);
+		static void calculateRPN(const char* argv);
 
 		class BadInput : public std::runtime_error {
 			public:
